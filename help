@@ -1,0 +1,133 @@
+#include "Biblioteca.h"
+
+void insert(int key,struct min *minimum)
+{
+    minimum->size++;
+    minimum->heap[minimum->size] = key;
+    heapifyUp(minimum);
+}
+
+void heapifyUp(struct min *minimum){ // last element
+    int i = minimum->size;
+
+    while(1){ 
+        int parent = i/2;
+        if (parent > 0 && heap[parent] > heap[i]){
+            int t = minimum->heap[parent];
+            minimum->heap[parent] = minimum->heap[i];
+            minimum->heap[i]=t;
+            i = parent;
+        } else {
+            break;
+        }
+    }
+}
+
+void printHeap(struct min *minimum){
+    int i = 1;
+    while(i <= minimum->size){
+        printf("%d ", minimum->heap[i]);
+        i++;
+    }
+    printf("\n");
+}
+
+void add_graph(struct lista *head,int peso,int x,int y)
+{
+	struct node *new_node;
+	new_node =(struct node *)malloc(sizeof(struct node ));
+	if(new_node==NULL)exit (43);
+	new_node->peso = peso;
+	new_node->next = NULL;
+	new_node->link[0] = x;
+	new_node->link[1] = y; 
+	new_node->key = LONG_MAX;
+	if (head->first==NULL)
+	{	
+		head->first=new_node;
+		head->final=new_node;
+	}
+	else
+	{
+		head->final->next=new_node;
+		head->final=new_node;
+	}
+}
+void print_graph(struct lista *head)
+	{	
+		struct lista *teste;
+		teste=head;
+		printf("first -> %d\n",teste->first->peso);
+		printf("final -> %d\n",teste->final->peso);
+		while (teste->first!=NULL)
+		{	
+			printf("link x=%d y=%d =",teste->first->link[0],teste->first->link[1]);
+			printf("\t%d\n ",teste->first->peso);
+			teste->first=teste->first->next;
+		}
+		
+	}
+	// A FUNÇÃO NO_OF_EDGES FALA QUANTAS ARESTAS TEM
+int no_of_edges(struct lista **head,int no_of_nodes)
+{	
+	int i=0,j=0;
+	struct lista **aux;
+	aux=head;
+	while(i<no_of_nodes)
+	{	
+		if(aux[i]->first->next==NULL)
+		{	
+			i++;
+			j++;
+		}
+		else
+		{
+			j++;
+			aux[i]->first=aux[i]->first->next;
+		}
+	}
+	return j/2;
+}
+
+// A FUNÇÃO MST PEGA A LISTA E VAI INSERINDO NUM VETOR HEAP[]
+void mst(struct lista **head,int no_of_edges)
+{	
+	struct min *minimum;
+	minimum =(struct min *)malloc(sizeof(struct min ));
+	if (minimum==NULL)exit (44);	
+	minimum->heap = malloc((no_of_edges)*sizeof(int));
+	
+	struct lista **aux;
+	int i,j=0,k=0,count=0;
+	for(i=0;i<no_of_edges;i++)
+	{	
+		if (aux[j]->first->next==NULL)
+		{
+			insert(aux[j]->first->peso,minimum);
+			j++;
+			for (;k>=aux[j]->first->link[0];k++)
+			{
+				aux[j]->first=aux[j]->first->next;
+				if(aux[j]->first->next==NULL)break;
+			}
+			
+			if(aux[j]->first->next!=NULL)
+			{
+				insert(aux[j]->first->peso,minimum);
+				count++;
+			}
+		}
+		else if (count ==0)
+		{
+			insert(aux[j]->first->peso,minimum);	
+			aux[j]->first=aux[j]->first->next;		
+		}
+		else 
+		{
+			count=0;
+			aux[j]->first=aux[j]->first->next;
+		}
+	}
+	
+printHeap(minimum);
+}
